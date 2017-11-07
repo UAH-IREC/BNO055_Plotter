@@ -7,19 +7,29 @@ tstep = 0.1;
 position = [0, 0, 0];
 orientations = [position];
 fig = figure();
+lastq = [0 0 0 0];
+last_time = 0;
 while ishandle(fig)
     % Format is w, x, y, z, X, Y, Z
     % Where w, x, y, z are the components of the quaternion
     % And X, Y, Z are the accelerations along the x, y, and z axes
+
     line = sscanf(fgets(s), '%g,', [11, 1]).';
+
     %disp(line);
-    if length(line) < 8 || all(line(1:4) == 0) 
-        disp('Incomplete line');
+    if length(line) < 8 || all(line(5:8) == 0) || line(1) < last_time 
+        %disp('Incomplete line');
         continue
     end
+    last_time = line(1);
     
     quat = line(5:8);
     quat = quatinv(quat);
+    %disp(quat)
+    if norm(quat - lastq) > 0.000025 && any(lastq ~= [0 0 0 0])
+        disp(line)
+    end
+    lastq = quat;
     varied = 0:0.05:1;
     empty = zeros([1, length(varied)]);
     xp = quatrotate(quat, [varied; empty; empty]');
@@ -43,7 +53,8 @@ while ishandle(fig)
     axis([-1 1 -1 1 -1 1]);
     axis vis3d
     drawnow;
-    pause(0.001);
+    flushinput(s);
+    pause(0.002);
 end
 
 fclose(s);
