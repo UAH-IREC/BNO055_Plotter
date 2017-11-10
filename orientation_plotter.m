@@ -1,5 +1,6 @@
 instrreset;
-s = serial('COM41');
+clear, clc
+s = serial('COM48');
 s.baudrate = 115200;
 fopen(s);
 
@@ -9,6 +10,7 @@ orientations = [position];
 fig = figure();
 lastq = [0 0 0 0];
 last_time = 0;
+
 while ishandle(fig)
     % Format is w, x, y, z, X, Y, Z
     % Where w, x, y, z are the components of the quaternion
